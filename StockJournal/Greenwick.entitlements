@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Not sandboxed. Hardened Runtime is enabled in project.yml. -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+
+    <!-- Outgoing network for the optional Anthropic / Finnhub features -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- Read/write files the user picks (CSV import, exports, backups) -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+</dict>
+</plist>

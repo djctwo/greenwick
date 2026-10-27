@@ -1,0 +1,59 @@
+# Xcode (the project is generated from project.yml with xcodegen)
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+xcuserdata/
+*.pbxuser
+*.perspectivev3
+.build/
+.swiftpm/
+
+# Build artifacts
+build/
+bin/
+*.app
+*.zip
+*.dmg
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.xcresult
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local secrets and tooling
+.env
+.env.*
+secrets.plist
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.keystore
+*.mobileprovision
+*.provisionprofile
+*.sjbackup
+*.sjbackup-enc
+Secrets/
+credentials/
+keys/
+CLAUDE-SECURITY-*/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.claude/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python (icon generation scripts)
+__pycache__/
+*.pyc

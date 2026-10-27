@@ -1,0 +1,218 @@
+name: macOS build and tests
+
+on:
+  push:
+    branches: [main, "ci/**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Select Xcode
+        # Pinned so CI doesn't change when the runner image's default Xcode does
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app && xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Greenwick.xcodeproj \
+            -scheme GreenwickUnitTests \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/test \
+            GREENWICK_BUNDLE_ID=com.greenwick.app.ci
+
+      - name: Release build (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Greenwick.xcodeproj \
+            -scheme Greenwick \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/release
+
+      - name: Zip the app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/release/Build/Products/Release/Greenwick.app \
+            Greenwick-macOS-unsigned.zip
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Greenwick-macOS-unsigned
+          path: Greenwick-macOS-unsigned.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  # Launches the app: UI tests, a walk through every screen with the sample trades, and
+  # screenshots. Runs here, never on a developer's Mac with a real Greenwick install:
+  # throwaway bundle ID (own preferences), and each test gets its own data folder (outside
+  # the test runner's container) and its own Keychain service.
+  ui-tests:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      GREENWICK_BUNDLE_ID: com.greenwick.app.ci
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Select Xcode
+        # Pinned so CI doesn't change when the runner image's default Xcode does
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app && xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: UI tests (sample data walk-through + screenshots)
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/uitest-data"
+          TEST_RUNNER_GREENWICK_UITEST_ROOT="$RUNNER_TEMP/uitest-data" \
+          xcodebuild test \
+            -project Greenwick.xcodeproj \
+            -scheme Greenwick \
+            -only-testing:GreenwickUITests \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/dd-ui" \
+            -resultBundlePath "$RUNNER_TEMP/ui.xcresult" \
+            GREENWICK_BUNDLE_ID="$GREENWICK_BUNDLE_ID"
+
+      - name: Export screenshots
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/attachments" "$RUNNER_TEMP/screenshots"
+          [ -d "$RUNNER_TEMP/ui.xcresult" ] || exit 0
+          xcrun xcresulttool export attachments \
+            --path "$RUNNER_TEMP/ui.xcresult" \
+            --output-path "$RUNNER_TEMP/attachments"
+          # Keep the screenshots the tests name themselves (skip XCTest's automatic
+          # snapshots, hierarchies and recordings) and write a small manifest for them.
+          python3 - "$RUNNER_TEMP/attachments" "$RUNNER_TEMP/screenshots" <<'PY'
+          import json, re, shutil, sys
+          from pathlib import Path
+          src, dst = Path(sys.argv[1]), Path(sys.argv[2])
+          shots = []
+          for test in json.loads((src / "manifest.json").read_text()):
+              for a in test.get("attachments", []):
+                  name = re.sub(r"_\d+_[0-9A-F-]{36}(\.png)?$", "", a.get("suggestedHumanReadableName", ""))
+                  if not a["exportedFileName"].endswith(".png") or name.startswith("UI Snapshot"):
+                      continue
+                  shutil.copy(src / a["exportedFileName"], dst / f"{name}.png")
+                  shots.append({"test": test["testIdentifier"], "screenshot": f"{name}.png"})
+          shots.sort(key=lambda s: s["screenshot"])
+          (dst / "manifest.json").write_text(json.dumps(shots, indent=2) + "\n")
+          print("\n".join(f'{s["screenshot"]:40} {s["test"]}' for s in shots))
+          PY
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Greenwick-ui-tests
+          path: ${{ runner.temp }}/screenshots
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload test results (on failure)
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Greenwick-ui-xcresult
+          path: ${{ runner.temp }}/ui.xcresult
+          if-no-files-found: warn
+          retention-days: 7
+
+  # Pushing a version tag (for example v1.0.0) builds the unsigned Release app and publishes
+  # it as a GitHub Release, after the unit tests passed. Release notes: an existing release
+  # for the tag (e.g. drafted by hand) keeps its notes and only gets the files attached;
+  # otherwise docs/release-notes/<tag>.md is used if it exists, else GitHub's generated notes.
+  # This is the only job that can write to the repository (to create the release).
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Select Xcode
+        # Pinned so CI doesn't change when the runner image's default Xcode does
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app && xcodebuild -version
+
+      - name: Check the tag matches the app version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          app_version=$(sed -n 's/^ *MARKETING_VERSION: "\(.*\)"$/\1/p' project.yml)
+          if [ "${TAG#v}" != "$app_version" ]; then
+            echo "::error::Tag $TAG does not match MARKETING_VERSION $app_version in project.yml"
+            exit 1
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Release build (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Greenwick.xcodeproj \
+            -scheme Greenwick \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/release
+
+      - name: Zip the app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/release/Build/Products/Release/Greenwick.app \
+            Greenwick-macOS-unsigned.zip
+          shasum -a 256 Greenwick-macOS-unsigned.zip > Greenwick-macOS-unsigned.zip.sha256
+          cat Greenwick-macOS-unsigned.zip.sha256
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          zip=Greenwick-macOS-unsigned.zip
+          notes="docs/release-notes/$TAG.md"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" "$zip" "$zip.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+          elif [ -f "$notes" ]; then
+            gh release create "$TAG" "$zip" "$zip.sha256" --repo "$GITHUB_REPOSITORY" \
+              --verify-tag --title "Greenwick ${TAG#v}" --notes-file "$notes"
+          else
+            gh release create "$TAG" "$zip" "$zip.sha256" --repo "$GITHUB_REPOSITORY" \
+              --verify-tag --title "Greenwick ${TAG#v}" --generate-notes
+          fi

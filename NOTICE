@@ -1,0 +1,35 @@
+Greenwick
+Copyright (C) 2026 Douglas Cleary
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License (LICENSE) for more
+details.
+
+If you distribute Greenwick or a modified version of it, you must make the
+complete corresponding source code available under the same license. Keep this
+NOTICE and the copyright line above in any copy or derivative work.
+
+Not financial advice
+--------------------
+Greenwick is a journaling and analytics tool. Nothing it shows, including any
+AI-generated text, is investment advice.
+
+Names and trademarks
+--------------------
+Broker and platform names (Thinkorswim, Interactive Brokers, Webull,
+TradingView, NinjaTrader, Robinhood, Charles Schwab, Fidelity, E*Trade,
+Tastytrade), Anthropic, Claude and Finnhub are trademarks of their respective
+owners. They are named only to describe file formats and optional services.
+Greenwick is not affiliated with, or endorsed by, any of them. The sample files
+in TestData/ are invented and contain no real account data.
+
+Third-party software
+--------------------
+- GRDB.swift (MIT License), fetched by Swift Package Manager at build time.
+- DM Sans and JetBrains Mono fonts (SIL Open Font License 1.1). Their license
+  texts ship in StockJournal/Resources/Fonts/.
