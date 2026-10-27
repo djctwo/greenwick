@@ -158,3 +158,8 @@ xcodebuild build -project Greenwick.xcodeproj -scheme Greenwick -configuration R
   `.github/workflows/macos.yml`, which builds the unsigned Release app and attaches
   `Greenwick-macOS-unsigned.zip` (+ `.sha256`) to a GitHub Release (notes:
   `docs/release-notes/<tag>.md` if present).
+
+## Website
+- https://djctwo.github.io/greenwick/ is served by GitHub Pages from the `gh-pages` branch (static HTML, separate history; not in `main`).
+  To change it: `git worktree add ../greenwick-site gh-pages`, edit, commit, push `gh-pages`. Keep `googlefef3924f77af7b34.html`
+  (Google Search Console verification) and `.nojekyll`. Copy claims only from this README.
