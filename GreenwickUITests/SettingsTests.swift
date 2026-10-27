@@ -114,6 +114,7 @@ final class SettingsTests: GreenwickUITestCase {
         snapshot("backup-options-protected", of: app)
 
         buttonLabeled("Cancel", in: app).click()
-        XCTAssertTrue(text("Back Up Journal", in: app).waitForNonExistence(timeout: 5))
+        // Not the "Back Up Journal" text: the Settings button has the same label and stays
+        XCTAssertTrue(protect.waitForNonExistence(timeout: 5), "Cancel should close the backup options")
     }
 }
