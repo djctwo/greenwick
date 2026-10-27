@@ -26,6 +26,11 @@ What Greenwick protects:
 - **The journal on disk.** The database is always encrypted (AES-256-GCM). It is
   decrypted into memory only; no plaintext copy or write-ahead log is ever written. The
   journal and backups are created readable by your user account only.
+- **Screenshots.** Images attached to trades are encrypted with the journal's key
+  (AES-256-GCM, the file name bound in), written readable by your user account only, and
+  decrypted into memory only to show them; nothing is decrypted or written while Greenwick
+  is locked. Plain image files saved by older versions are encrypted in place the first
+  time the key is available (launch with App Lock off, otherwise unlock).
 - **The key.** With App Lock off, the journal key is stored in your macOS Keychain. With
   App Lock on, it is stored sealed with your password (PBKDF2-SHA256, 600,000 rounds), so
   the journal can't be decrypted without the password, even by someone who copies the
@@ -41,7 +46,8 @@ What Greenwick protects:
 - **Rollback.** Every save is numbered inside the encrypted file and in the Keychain. An
   older copy of the journal put back on disk is never opened silently. Each save is
   flushed to stable storage (`F_FULLFSYNC`) before its number is recorded, and a key
-  change deletes the old key only after the re-encrypted file is on disk and reads back.
+  change deletes the old key only after the re-encrypted journal and every screenshot are
+  on disk and read back.
   Until then (for example on a full disk, or if Greenwick quits in the middle) the old key
   stays in the Keychain: after a password change it is wrapped with the new password;
   after turning App Lock on it is the plain lock-off key it was before, so until the next
@@ -63,14 +69,14 @@ What it does not protect against:
   lost, saves it at the next unlock, and asks before quitting without them (if Greenwick
   locks while it asks, it doesn't quit).
 - **App Lock off.** Without App Lock, anyone who can use your logged-in macOS account can
-  open the journal, because the key is in your login Keychain.
-- **Files outside the journal.** Trade screenshots are stored as plain image files.
-  Backups without a password, and CSV and PDF exports, are not encrypted. Watchlist
+  open the journal and its screenshots, because the key is in your login Keychain.
+- **Files outside the journal.** Backups without a password, and CSV and PDF exports, are
+  not encrypted. Backups don't include screenshots (only their file names). Watchlist
   symbols, checklist rules and display settings are kept in Greenwick's ordinary
   preferences file.
 - **Forgotten passwords.** In the unsigned release builds there is no password recovery:
   a forgotten App Lock password means erasing the local data (after Touch ID or your Mac
-  password) and restoring a backup. A forgotten backup password means that backup can't
+  password) and restoring a backup (screenshots aren't in backups, so they are lost). A forgotten backup password means that backup can't
   be opened.
 - **Unsigned builds.** Release builds are not signed with an Apple Developer ID or
   notarized, so macOS can't confirm who built them. Download Greenwick only from this

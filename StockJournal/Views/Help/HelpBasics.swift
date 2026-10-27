@@ -91,7 +91,7 @@ struct HelpExportingData: View {
             HelpBullet("Edge Report: edge breakdowns by session, hour, symbol and day, plus AI recommendations if you ran them.")
 
             HelpSubtitle("Data Backup")
-            HelpParagraph("Back up your whole journal from Settings > Data > Back Up Journal. The backup file contains all your trades, notes, tags, checkpoints and settings. You can restore from a backup at any time with Restore Backup.")
+            HelpParagraph("Back up your whole journal from Settings > Data > Back Up Journal. The backup file contains all your trades, notes, tags, checkpoints and settings. Screenshots attached to trades are not included (a trade keeps only their file names); they stay encrypted in Greenwick's data folder, readable only with this installation's journal key. You can restore from a backup at any time with Restore Backup.")
             HelpParagraph("Turn on \"Protect this backup with a password\" (on by default when App Lock is on) to encrypt the backup: AES-256-GCM with a key derived from the password (PBKDF2-SHA256, 600,000 rounds, minimum 8 characters). Without that password the backup can't be restored, and Greenwick can't recover it for you.")
             HelpWarning("A backup without a password is a plain, unencrypted copy of your journal: anyone who gets the file can read it. Protecting backups with a password is recommended.")
             HelpParagraph("When you restore a password-protected backup, Greenwick asks for its password. A wrong password changes nothing; you can try again or cancel. Backups protected by older versions of Greenwick still restore with their password.")

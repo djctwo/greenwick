@@ -87,8 +87,8 @@ xcodebuild build -project Greenwick.xcodeproj -scheme Greenwick -configuration R
   sets `isLockRequested` and locks when it ends. After every `await` the code still
   re-checks its state (`isLocked`; `rotateKey` and Turn Off check that the journal they
   started with is still open, since quitting can close it). `rotateKey`
-  (`AppState+KeyChange.swift`) deletes old keys only after the re-sealed file reads back
-  with the new key, and once step 1 is stored never reports failure
+  (`AppState+KeyChange.swift`) deletes old keys only after the re-sealed file AND every
+  screenshot read back with the new key, and once step 1 is stored never reports failure
   (`KeyChange.finishesAtNextUnlock`: the new password is in force). `rekey` throws on a
   closed or in-memory journal. Unlock with no lock left in the Keychain opens like a
   lock-off launch (and leaves the wrong-password count alone; a correct password resets it
@@ -118,10 +118,23 @@ xcodebuild build -project Greenwick.xcodeproj -scheme Greenwick -configuration R
   `.journalSaveFailed` (shown as the "Database Issue" alert). The migrator never erases a
   database (no `eraseDatabaseOnSchemaChange`, not even in Debug). Keychain writes update in
   place (never delete-then-add). Backup schema checks use `PRAGMA table_xinfo`.
-- The sealed journal and backup exports are written with `SecureFileWriter` (random temp
-  name, `O_CREAT|O_EXCL|O_NOFOLLOW` 0600, fchmod + `F_FULLFSYNC` on the descriptor, `rename`,
-  then the folder is flushed; never reopened or chmod'ed by path). Tests inject journal
-  write failures through `JournalFileWriter` (`AppState(journalWriter:)`).
+- Screenshots (`Services/Screenshots/ScreenshotManager*.swift`, owned by `AppState.screenshots`):
+  sealed with the journal key (`ScreenshotFormat`: "GWSC" | version, header + file name =
+  AES-GCM associated data) via `SecureFileWriter`, read back after every write, decrypted into
+  memory only. The key is set by `AppState` (`install`, `screenshotsBecameReadable`) and is nil
+  from the moment `lock()` runs: no decrypt, no write while locked. Every write and the key
+  switch run under `fileLock`, which `reseal(from:to:)` shares (it switches the key and lists
+  the files in one step). Key rotation and the unlock that finishes one re-seal every file
+  (`AppState+Screenshots.swift`); a file that still needs the old key keeps it stored
+  (`pendingScreenshotKeys`; a further change or Turn Off first finishes it or throws
+  `screenshotsPending`). Plain files from older versions: `sealLegacyFiles` at launch (lock
+  off) / unlock, in place, resumable; crash leftovers `*.saving-*` removed. Erase uses
+  `removeAll()`. Backups don't include screenshots (only names in `trades.screenshots`).
+- The sealed journal, screenshots and backup exports are written with `SecureFileWriter`
+  (random temp name, `O_CREAT|O_EXCL|O_NOFOLLOW` 0600, fchmod + `F_FULLFSYNC` on the
+  descriptor, `rename`, then the folder is flushed; never reopened or chmod'ed by path).
+  Tests inject write failures through `JournalFileWriter` (`AppState(journalWriter:)`,
+  `AppState(screenshotWriter:)`).
 - Opening: only a file that fails to decrypt (`DatabaseManager.isUnreadable`) is set aside
   as `.unreadable-<date>`; any other error (disk, permissions) leaves it untouched with a
   message. The save made while opening is non-fatal (journal stays open in memory, reported

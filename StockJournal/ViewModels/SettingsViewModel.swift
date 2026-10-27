@@ -252,8 +252,8 @@ final class SettingsViewModel {
 
     /// The new password is already the one that unlocks; only the re-encryption is pending
     private static func finishesAtNextUnlock(_ done: String) -> String {
-        "\(done). From now on, use the new password to unlock. Greenwick couldn't re-encrypt the journal "
-            + "file just now; it finishes that the next time you unlock."
+        "\(done). From now on, use the new password to unlock. Greenwick couldn't finish re-encrypting the "
+            + "journal and its screenshots just now; it finishes that the next time you unlock."
     }
 
     private func clearPasswordFields() {

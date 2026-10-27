@@ -29,9 +29,9 @@ Created by [Douglas Cleary](https://github.com/djctwo).
   no upgrade screen. The full source code is in this repository under the GPL-3.0.
 - **Everything stays on your Mac.** Your journal is a local, encrypted database. There is
   no account to create, no subscription, no cloud sync and no telemetry.
-- **App Lock protects the journal with your password.** The journal is always encrypted
-  on disk; with App Lock on, its key is sealed with your password, so nothing can be
-  decrypted until you unlock Greenwick.
+- **App Lock protects the journal with your password.** The journal and the screenshots
+  you attach to trades are always encrypted on disk; with App Lock on, their key is sealed
+  with your password, so nothing can be decrypted until you unlock Greenwick.
 - **AI is optional and uses your own key.** If you add your own Anthropic API key and
   switch on *Allow AI analysis*, the Edge Report can write recommendations. Only summary
   statistics are sent, never your individual trades, notes or account details, and only
@@ -59,8 +59,11 @@ Created by [Douglas Cleary](https://github.com/djctwo).
 - **Sample trades:** load 30 fictional trades from the welcome screen or *Settings > Load
   Sample Trades* to explore before importing your own; *Remove Sample Trades* deletes only
   those.
-- **Encrypted journal:** the database is AES-256-GCM encrypted and never written to disk
-  unencrypted; it is decrypted into memory only. API keys live in the macOS Keychain.
+- **Encrypted journal and screenshots:** the database is AES-256-GCM encrypted and never
+  written to disk unencrypted; it is decrypted into memory only. Trade screenshots are
+  encrypted with the same key and decrypted into memory only to show them; screenshots saved
+  by an older version are encrypted the first time you open (or unlock) Greenwick. API keys
+  live in the macOS Keychain.
 - **App Lock with idle auto-lock:** the journal key is sealed with your password
   (PBKDF2-SHA256, 600,000 rounds). Greenwick locks again when it goes to the background
   and after a time without keyboard or mouse activity (Off, 1, 5, 15, 30 or 60 minutes;
@@ -71,7 +74,10 @@ Created by [Douglas Cleary](https://github.com/djctwo).
 - **Password-protected backups:** backups can be encrypted with a password (AES-256-GCM,
   PBKDF2-SHA256 600,000 rounds; on by default when App Lock is on), and every backup is
   validated before a restore. A backup without a password is readable by anyone who gets
-  the file, so the password is recommended.
+  the file, so the password is recommended. Backups hold the journal only: the screenshots
+  attached to trades are not in a backup (a trade keeps only their file names). They are
+  encrypted with this installation's journal key, so copying the Screenshots folder to
+  another Mac or a fresh install doesn't bring them along.
 
 ### Optional extras (bring your own key, off by default)
 
@@ -143,7 +149,8 @@ xcodebuild test -project Greenwick.xcodeproj -scheme Greenwick -only-testing:Gre
 ## Where your data lives
 
 - Trades: `~/Library/Application Support/Greenwick/Greenwick.sqlite` (encrypted)
-- Screenshots: `~/Library/Application Support/Greenwick/Screenshots/` (plain image files)
+- Screenshots: `~/Library/Application Support/Greenwick/Screenshots/` (encrypted with the
+  journal's key)
 - Prop firm account size and limits: inside the encrypted journal. Watchlist symbols,
   checklist rules, the inactivity lock setting and display preferences: Greenwick's
   ordinary preferences file.
