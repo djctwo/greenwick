@@ -13,17 +13,19 @@ extension AppState {
     enum KeyChange: Equatable {
         /// All three steps done. `hasRecovery`: Touch ID / Mac password recovery is available.
         case done(hasRecovery: Bool)
-        /// The new password is in force, but the journal couldn't be re-sealed yet (it was
-        /// closed by a lock, or the write failed): the next unlock finishes the job with the
-        /// old key, which stays stored (wrapped by the new password) until then
+        /// The new password is in force, but the journal or a screenshot couldn't be re-sealed
+        /// yet (the journal was closed by a lock, or a write failed): the next unlock finishes
+        /// the job with the old key, which stays stored (wrapped by the new password) until then
         case finishesAtNextUnlock
     }
 
     // MARK: - Key rotation
 
-    /// Rotate the open journal to a brand-new key wrapped with `password`, in three steps
-    /// that each leave the journal decryptable if the app stops in between. Runs inside a
-    /// key operation (enable, change password, or the migration at unlock).
+    /// Rotate the open journal and its screenshots to a brand-new key wrapped with
+    /// `password`, in three steps that each leave everything decryptable if the app stops in
+    /// between. Runs inside a key operation (enable, change password, or the migration at
+    /// unlock). The old key is deleted only once the journal file AND every screenshot read
+    /// back with the new key.
     ///
     /// Throws only when nothing changed (step 1 failed). Once step 1 is stored the new
     /// password is the one that unlocks, so a later problem is reported as
@@ -35,6 +37,10 @@ extension AppState {
         guard manager.isOpen, let current = manager.encryptionKey else {
             throw AppLockVault.VaultError.keyUnavailable
         }
+        // An earlier change left screenshots on an older key: finish that first (or change
+        // nothing), since step 1 replaces the older key that is still stored
+        try await finishPendingScreenshots(to: current)
+        guard database === manager, manager.isOpen else { throw AppLockVault.VaultError.lockedMeanwhile }
         let newKey = SymmetricKey(size: .bits256)
         let vault = self.vault
         let currentRaw = AppLockVault.raw(current)
@@ -61,6 +67,13 @@ extension AppState {
             guard manager.fileOpens(with: newKey) else { throw DatabaseManager.StorageError.serializationFailed }
         } catch {
             Self.logger.error("Key change: re-sealing failed (\(error.localizedDescription)); finishes at next unlock")
+            return .finishesAtNextUnlock
+        }
+        //    Then every screenshot (each one read back): one that still needs the old key keeps it
+        let pending = await resealScreenshots(from: [current], to: newKey)
+        guard pending.isEmpty else {
+            pendingScreenshotKeys = [AppLockVault.raw(current)]
+            Self.logger.error("Key change: \(pending.count) screenshot(s) not re-sealed; finishes at next unlock")
             return .finishesAtNextUnlock
         }
         // 3. Recovery copy to the new key; delete every old key
@@ -118,6 +131,8 @@ extension AppState {
             throw error
         }
         await hooks.afterDisablePasswordCheck?()
+        // Turning off keeps only the journal's key: screenshots must not need an older one
+        try await finishPendingScreenshots(to: key)
         guard !isLocked, database === manager, manager.isOpen else {
             Self.logger.notice("App Lock: turning off skipped, the journal closed meanwhile")
             throw AppLockVault.VaultError.lockedMeanwhile

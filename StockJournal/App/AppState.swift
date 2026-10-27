@@ -18,6 +18,14 @@ final class AppState {
     @ObservationIgnored let vault: AppLockVault
     @ObservationIgnored let databasePath: String
     @ObservationIgnored let screenshotsDirectory: URL
+    /// The trade screenshots, sealed with the journal's key (`AppState+Screenshots.swift`)
+    @ObservationIgnored let screenshots: ScreenshotManager
+    /// Keys (raw) that some screenshot may still need after a key change couldn't re-seal
+    /// every file: the next change or Turn Off first finishes that (`finishPendingScreenshots`).
+    /// Cleared when Greenwick locks; the next unlock finds them in the Keychain again.
+    @ObservationIgnored var pendingScreenshotKeys: [Data] = []
+    /// The background sealing of plain screenshots from older versions (tests await it)
+    @ObservationIgnored var legacyScreenshotSealing: Task<Int, Never>?
     /// Writes the sealed journal (tests inject a failing disk)
     @ObservationIgnored let journalWriter: JournalFileWriter
     /// Held while this process owns the data folder (`InstanceLock`)
@@ -76,11 +84,13 @@ final class AppState {
         vault: AppLockVault = .live,
         databasePath: String = AppPaths.databaseURL.path,
         screenshotsDirectory: URL = AppPaths.screenshotsDirectory,
-        journalWriter: JournalFileWriter = .secure
+        journalWriter: JournalFileWriter = .secure,
+        screenshotWriter: JournalFileWriter = .secure
     ) {
         self.vault = vault
         self.databasePath = databasePath
         self.screenshotsDirectory = screenshotsDirectory
+        self.screenshots = ScreenshotManager(baseDir: screenshotsDirectory, writer: screenshotWriter)
         self.journalWriter = journalWriter
         let placeholder = Self.makePlaceholder()
         self.database = placeholder
@@ -107,6 +117,7 @@ final class AppState {
             isLocked = true
         } else {
             openJournalWithPlainKey()
+            screenshotsBecameReadable()
         }
 
         // Optional launch argument, e.g. `-startTab Dashboard` (not persisted)
@@ -194,6 +205,8 @@ final class AppState {
     func install(_ manager: DatabaseManager) {
         database = manager
         tradeRepository = TradeRepository(database: manager)
+        // Screenshots open with the journal's key only while unlocked (none while locked)
+        screenshots.useKey(isLocked ? nil : manager.encryptionKey)
         // Older versions kept the prop firm account size and limits in the plaintext preferences
         PropFirmSettings.migrateFromPreferences(.standard, into: manager)
         // E.g. a full disk: the journal is open in memory, but saving it failed

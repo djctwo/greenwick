@@ -26,6 +26,9 @@ extension AppLockVault {
         case busy
         /// Erase couldn't delete the journal file, so it stopped before deleting any key
         case journalNotDeleted
+        /// An earlier key change couldn't re-encrypt every screenshot yet, and they still
+        /// can't be: their older key must stay, so nothing was changed
+        case screenshotsPending
 
         var errorDescription: String? {
             switch self {
@@ -50,6 +53,10 @@ extension AppLockVault {
                 "Greenwick couldn't delete the journal file, so nothing was erased and your keys were kept. Check "
                     + "that the Greenwick folder can be changed (and that the file isn't marked Locked in Finder), "
                     + "then try again."
+            case .screenshotsPending:
+                "Greenwick couldn't finish re-encrypting your screenshots after the last password change, so "
+                    + "nothing was changed (their previous key must stay until they are). Check that the Greenwick "
+                    + "folder can be changed and the disk isn't full, then try again."
             }
         }
     }

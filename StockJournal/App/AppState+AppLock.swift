@@ -107,14 +107,21 @@ extension AppState {
             do {
                 if let primary = keys.primary.map({ SymmetricKey(data: $0) }) {
                     // Finish an interrupted rotation: re-seal with the current key, and let the
-                    // old keys go only once the file on disk opens with it
+                    // old keys go only once the file on disk and every screenshot open with it
                     if AppLockVault.raw(key) != AppLockVault.raw(primary) {
                         try manager.rekey(to: primary)
                         guard manager.fileOpens(with: primary) else {
                             throw DatabaseManager.StorageError.serializationFailed
                         }
                     }
-                    vault.finishUnlock(primary: primary)
+                    let olds = candidates.filter { AppLockVault.raw($0) != AppLockVault.raw(primary) }
+                    if await resealScreenshots(from: olds, to: primary).isEmpty {
+                        vault.finishUnlock(primary: primary)
+                    } else {
+                        // Their old key stays stored; the next key change or unlock tries again
+                        pendingScreenshotKeys = olds.map(AppLockVault.raw)
+                        Self.logger.error("Unlock: some screenshots still need an older key; it stays stored")
+                    }
                 } else if keys.needsRotation {
                     // Install from before key wrapping: move to a new, wrapped key
                     _ = try await rotateKey(password: password)
@@ -134,6 +141,7 @@ extension AppState {
         isAppLockEnabled = true
         keychainUnreadableAtLaunch = false
         isLocked = false
+        screenshotsBecameReadable()
         vault.throttle.reset() // the right password: the wrong-password count starts over
         Self.logger.notice("App Lock: unlocked")
         return .unlocked
@@ -157,6 +165,7 @@ extension AppState {
         keychainUnreadableAtLaunch = false
         openJournalWithPlainKey()
         isLocked = false
+        screenshotsBecameReadable()
         return .unlocked
     }
 
@@ -179,6 +188,7 @@ extension AppState {
         do {
             let key = try vault.plainKey(createIfMissing: false)
             install(try openManager(key: key, acceptOlder: true))
+            screenshotsBecameReadable()
             olderJournal = nil
             Self.logger.notice("Owner opened a journal older than the last one saved on this Mac")
             return true
@@ -206,6 +216,9 @@ extension AppState {
         }
         guard isAppLockEnabled, !isLocked else { return }
         isLocked = true
+        // From now on no screenshot is decrypted or written (waits for one being written)
+        screenshots.useKey(nil)
+        pendingScreenshotKeys = []
         // An app-modal panel (e.g. the backup save/open panel) would stay on top of the lock
         // screen: end it; its runModal returns without a choice, so nothing is written or
         // restored. SwiftUI sheets and alerts go away with the journal views they belong to.

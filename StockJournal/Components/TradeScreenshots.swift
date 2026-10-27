@@ -3,95 +3,10 @@ import AppKit
 import UniformTypeIdentifiers
 import os
 
-// MARK: - Screenshot Manager
-
-/// Handles file operations for trade screenshot attachments
-final class ScreenshotManager: Sendable {
-    static let shared = ScreenshotManager()
-    private static let logger = Logger(subsystem: "com.greenwick", category: "ScreenshotManager")
-
-    private var baseDir: URL {
-        AppPaths.screenshotsDirectory
-    }
-
-    /// Get the screenshots directory for a trade
-    func screenshotDir(for tradeId: Int64) -> URL {
-        baseDir.appendingPathComponent("\(tradeId)", isDirectory: true)
-    }
-
-    /// Save an image to the trade's screenshot folder, returns the filename
-    func saveImage(_ image: NSImage, for tradeId: Int64) throws -> String {
-        let dir = screenshotDir(for: tradeId)
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-
-        guard let tiff = image.tiffRepresentation,
-              let rep = NSBitmapImageRep(data: tiff),
-              let jpeg = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.85]) else {
-            throw ScreenshotError.encodingFailed
-        }
-
-        let filename = "\(UUID().uuidString).jpg"
-        let url = dir.appendingPathComponent(filename)
-        try jpeg.write(to: url)
-        Self.logger.debug("Saved screenshot \(filename) for trade \(tradeId)")
-        return filename
-    }
-
-    /// Load an image by filename for a trade
-    func loadImage(filename: String, for tradeId: Int64) -> NSImage? {
-        guard let url = imageURL(filename: filename, for: tradeId) else { return nil }
-        return NSImage(contentsOf: url)
-    }
-
-    /// Delete a screenshot file (only a regular file inside the trade's own folder)
-    func deleteImage(filename: String, for tradeId: Int64) throws {
-        guard let url = imageURL(filename: filename, for: tradeId) else {
-            throw ScreenshotError.invalidFilename
-        }
-        let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
-        if FileManager.default.fileExists(atPath: url.path),
-           values?.isRegularFile != true || values?.isSymbolicLink == true {
-            throw ScreenshotError.invalidFilename
-        }
-        try FileManager.default.removeItem(at: url)
-        Self.logger.debug("Deleted screenshot for trade \(tradeId)")
-    }
-
-    /// Whether `filename` is one the app itself writes: `<UUID>.jpg`. Everything else
-    /// (".", "..", dot-files, paths, other extensions) comes from a crafted database.
-    static func isValidFilename(_ filename: String) -> Bool {
-        guard filename.count == 40, filename.lowercased().hasSuffix(".jpg") else { return false }
-        return UUID(uuidString: String(filename.dropLast(4))) != nil
-    }
-
-    /// Full URL for a screenshot, or nil if the name isn't one the app writes or would
-    /// resolve outside the trade's screenshot folder
-    func imageURL(filename: String, for tradeId: Int64) -> URL? {
-        guard Self.isValidFilename(filename) else {
-            Self.logger.error("Rejected unsafe screenshot filename")
-            return nil
-        }
-        let dir = screenshotDir(for: tradeId).standardizedFileURL
-        let url = dir.appendingPathComponent(filename, isDirectory: false).standardizedFileURL
-        guard url.deletingLastPathComponent().path == dir.path else { return nil }
-        return url
-    }
-
-    enum ScreenshotError: LocalizedError {
-        case encodingFailed
-        case invalidFilename
-        var errorDescription: String? {
-            switch self {
-            case .encodingFailed: "Failed to encode image as JPEG"
-            case .invalidFilename: "That screenshot name isn't valid, so it was left alone."
-            }
-        }
-    }
-}
-
 // MARK: - Trade Screenshots View
 
-/// Horizontal thumbnail strip for managing trade screenshot attachments
+/// Horizontal thumbnail strip for managing trade screenshot attachments. Images are
+/// encrypted on disk (`ScreenshotManager`) and decrypted into memory to display them.
 struct TradeScreenshots: View {
     let trade: Trade
     @Environment(\.appState) private var appState
@@ -99,7 +14,7 @@ struct TradeScreenshots: View {
     @State private var selectedImage: NSImage?
     @State private var showingImageViewer = false
 
-    private let manager = ScreenshotManager.shared
+    private var manager: ScreenshotManager { appState.screenshots }
     private static let maxScreenshots = 10
     private static let logger = Logger(subsystem: "com.greenwick", category: "TradeScreenshots")
 

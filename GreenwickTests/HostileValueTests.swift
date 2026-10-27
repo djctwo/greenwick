@@ -145,8 +145,8 @@ final class HostileValueTests: XCTestCase {
 
     // MARK: - Screenshot filenames (Dojix F8, same code here)
 
-    func testOnlyTheAppsOwnScreenshotNamesAreAccepted() {
-        let manager = ScreenshotManager.shared
+    func testOnlyTheAppsOwnScreenshotNamesAreAccepted() throws {
+        let manager = ScreenshotManager(baseDir: try makeScratchFolder())
         let good = "\(UUID().uuidString).jpg"
         let dir = manager.screenshotDir(for: 42).standardizedFileURL
         XCTAssertEqual(manager.imageURL(filename: good, for: 42)?.deletingLastPathComponent().standardizedFileURL, dir)

@@ -133,8 +133,8 @@ final class StorageAndPrivacyTests: XCTestCase {
 
 /// Screenshot filenames come from the database (which a restored backup controls).
 final class ScreenshotPathTests: XCTestCase {
-    func testScreenshotFilenamesCannotEscapeTheirFolder() {
-        let manager = ScreenshotManager.shared
+    func testScreenshotFilenamesCannotEscapeTheirFolder() throws {
+        let manager = ScreenshotManager(baseDir: try makeScratchFolder())
         let dir = manager.screenshotDir(for: 42).standardizedFileURL.path
         for hostile in ["..", ".", "../../etc/passwd", "/etc/passwd", "a/../../b", ""] {
             // Rejected outright (nil); a name is never resolved outside the trade's folder

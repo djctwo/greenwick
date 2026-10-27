@@ -41,6 +41,12 @@ extension AppState {
                 throw AppLockVault.VaultError.recoveryKeyOutdated
             }
         }
+        // Turning the lock off keeps only `key`. An enable interrupted before its screenshots
+        // were re-sealed left them on the old lock-off key, still stored: move them first.
+        // (Screenshots on an older key wrapped by the forgotten password can't be reached.)
+        if let plain = try? vault.plainKey(createIfMissing: false), AppLockVault.raw(plain) != AppLockVault.raw(key) {
+            _ = await resealScreenshots(from: [plain], to: key)
+        }
         try vault.removeLock(keeping: key)
         if let manager {
             if manager === heldJournal { reinstallHeldJournal(manager) } else { install(manager) }
@@ -48,6 +54,7 @@ extension AppState {
         isAppLockEnabled = false
         keychainUnreadableAtLaunch = false
         isLocked = false
+        screenshotsBecameReadable()
         Self.logger.notice("App Lock removed with Touch ID / Mac password recovery")
     }
 
@@ -91,7 +98,8 @@ extension AppState {
         for file in DatabaseEncryption.journalFiles(in: directory, databaseName: name) {
             try? files.removeItem(at: file)
         }
-        try? files.removeItem(at: screenshotsDirectory)
+        // Every screenshot, sealed or not (and any file a crash left mid-write)
+        if !screenshots.removeAll() { Self.logger.error("Erase: the screenshots folder couldn't be deleted") }
         vault.removeEverything() // also resets the wrong-password count
         olderJournal = nil
         keychainUnreadableAtLaunch = false
@@ -99,6 +107,7 @@ extension AppState {
         isDatabaseFailed = false
         openJournalWithPlainKey()
         isLocked = false
+        screenshotsBecameReadable()
         Self.logger.notice("All local data erased")
     }
 }
