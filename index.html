@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenwick: Free Stock &amp; Day Trading Journal for Mac (Open Source)</title>
+    <meta name="description" content="Greenwick is a free, open-source stock and day trading journal for Mac. Import trades from 10 brokers and see 60+ analytics and an Edge Report in dollars. Encrypted, local, no account.">
+    <meta name="theme-color" content="#0a0f0e">
+    <link rel="canonical" href="https://djctwo.github.io/greenwick/">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Greenwick">
+    <meta property="og:url" content="https://djctwo.github.io/greenwick/">
+    <meta property="og:title" content="Greenwick: free, open-source trading journal for stock and day traders on Mac">
+    <meta property="og:description" content="Import your broker's trade history and see, in dollars, where you make money and where you lose it. Encrypted, stays on your Mac, no account.">
+    <meta property="og:image" content="https://djctwo.github.io/greenwick/images/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Greenwick dashboard showing a daily brief, metric cards and an equity curve for fictional sample trades">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Greenwick: free stock trading journal for Mac">
+    <meta name="twitter:description" content="Free and open source (GPL-3.0). See, in dollars, where you make and lose money by session, hour, ticker and weekday.">
+    <meta name="twitter:image" content="https://djctwo.github.io/greenwick/images/og-image.png">
+    <meta name="twitter:image:alt" content="Greenwick dashboard with fictional sample trades">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/site.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Greenwick",
+        "url": "https://djctwo.github.io/greenwick/",
+        "description": "A free, open-source trading journal for stock and day traders on the Mac. Imports from 10 brokers, more than 60 analytics and an Edge Report that ranks sessions, hours, tickers and weekdays in dollars. The journal is encrypted and stays on your Mac.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "macOS",
+        "softwareRequirements": "macOS 14 Sonoma or later",
+        "isAccessibleForFree": true,
+        "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "downloadUrl": "https://github.com/djctwo/greenwick/releases/latest",
+        "codeRepository": "https://github.com/djctwo/greenwick",
+        "image": "https://djctwo.github.io/greenwick/images/dashboard.png",
+        "screenshot": "https://djctwo.github.io/greenwick/images/dashboard.png",
+        "author": { "@type": "Person", "name": "Douglas Cleary", "url": "https://github.com/djctwo" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": "Imports from Thinkorswim, Interactive Brokers, Webull, TradingView, NinjaTrader, Robinhood, Charles Schwab, Fidelity, E*Trade, Tastytrade and any CSV; trade journal with notes, tags, emotions, checklists, screenshots and replay; more than 60 analytics; Edge Report by session, hour, ticker and weekday; pre-market, regular and after-hours sessions; PDF and CSV exports; AES-256-GCM encrypted local journal; App Lock; password-protected backups; optional AI recommendations with your own API key"
+    }
+    </script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header class="site-nav">
+        <div class="container">
+            <a href="./" class="logo" aria-label="Greenwick home"><img src="images/apple-touch-icon.png" alt="" width="30" height="30"><span class="word">greenwick</span></a>
+            <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            </button>
+            <nav class="nav-links" id="nav-links" aria-label="Main">
+                <a href="#features">Features</a>
+                <a href="#privacy">Privacy</a>
+                <a href="#install">Install</a>
+                <a href="https://github.com/djctwo/greenwick">GitHub</a>
+                <a href="https://github.com/djctwo/greenwick/releases/latest" class="btn btn-primary">Download</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main">
+        <div class="container">
+            <section class="hero" aria-labelledby="hero-title">
+                <div class="hero-grid">
+                    <div>
+                        <div class="eyebrow">
+                            <span class="chip">Free &middot; Open source (GPL-3.0)</span>
+                            <span class="chip plain">Native Mac app</span>
+                        </div>
+                        <h1 id="hero-title">The free trading journal for <em>stock and day traders</em> on the Mac.</h1>
+                        <p class="lede">Greenwick is open source. Import your broker's trade history and it shows you, in dollars, <strong>where you make money and where you lose it</strong>: by session, hour, ticker and weekday.</p>
+                        <div class="cta-group">
+                            <a href="https://github.com/djctwo/greenwick/releases/latest" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10.5 12 15.5l5-5"/><path d="M5 19.5h14"/></svg>
+                                Download for Mac
+                            </a>
+                            <a href="https://github.com/djctwo/greenwick" class="btn btn-secondary">View on GitHub</a>
+                        </div>
+                        <p class="hero-facts"><span>macOS 14+</span><span>No account</span><span>No telemetry</span><span>Windows version coming soon</span></p>
+                    </div>
+                    <aside class="sessions" aria-labelledby="sessions-title">
+                        <p class="sessions-title" id="sessions-title">Built for US equities &middot; Eastern Time</p>
+                        <div class="ribbon" aria-hidden="true"><div class="pre"></div><div class="reg"></div><div class="post"></div></div>
+                        <div class="ribbon-labels">
+                            <div>Pre-market<small>04:00&ndash;09:30</small></div>
+                            <div>Regular<small>09:30&ndash;16:00</small></div>
+                            <div>After hours<small>16:00&ndash;20:00</small></div>
+                        </div>
+                        <p>Every trade is placed in its session, so you can see which one pays you and which one costs you. Gaps, opening range, sectors and earnings days are covered too.</p>
+                    </aside>
+                </div>
+
+                <figure class="shot-main">
+                    <div class="frame">
+                        <a href="images/dashboard.png" data-zoom aria-label="Enlarge dashboard screenshot">
+                            <img src="images/dashboard.png" alt="Greenwick dashboard: a daily brief with three signals, cards for total P&amp;L, win rate, profit factor and expectancy, a prop-firm tracker and an equity curve" width="1600" height="1066" fetchpriority="high">
+                        </a>
+                    </div>
+                    <figcaption class="made-up">Screenshots show Greenwick's built-in sample trades. Every number in them is made up.</figcaption>
+                </figure>
+            </section>
+
+            <div class="stats" role="list">
+                <div class="stat" role="listitem"><div class="stat-value teal">60+</div><div class="stat-label">Analytics</div></div>
+                <div class="stat" role="listitem"><div class="stat-value">10</div><div class="stat-label">Brokers &amp; platforms</div></div>
+                <div class="stat" role="listitem"><div class="stat-value">30</div><div class="stat-label">Sample trades</div></div>
+                <div class="stat" role="listitem"><div class="stat-value teal">GPL-3.0</div><div class="stat-label">Free &amp; open source</div></div>
+            </div>
+
+            <section class="section" id="features" aria-labelledby="features-title">
+                <p class="section-label">Features</p>
+                <h2 id="features-title">From broker export to answers</h2>
+                <p class="section-desc">Every feature is available to everyone. Nothing is locked and nothing expires.</p>
+
+                <div class="features">
+                    <article class="card lead">
+                        <p class="card-num">01</p>
+                        <h3>Imports from 10 brokers and platforms</h3>
+                        <p>Drop in a CSV export. Buys and sells are paired into round-trip trades first-in-first-out, including partial fills and short sales, and P&amp;L is shown after commissions and fees. Re-importing a file skips trades you already have.</p>
+                        <ul class="brokers" aria-label="Supported import formats">
+                            <li>Thinkorswim</li><li>Interactive Brokers</li><li>Webull</li><li>TradingView</li><li>NinjaTrader</li><li>Robinhood</li><li>Charles Schwab</li><li>Fidelity</li><li>E*Trade</li><li>Tastytrade</li><li class="any">Any CSV, via column mapping</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <p class="card-num">02</p>
+                        <h3>The journal</h3>
+                        <p>Filters, search, notes, tags, emotions, checklists and screenshots. Add trades by hand, and step through any trade with the replay.</p>
+                    </article>
+                    <article class="card">
+                        <p class="card-num">03</p>
+                        <h3>Dashboard and 60+ analytics</h3>
+                        <p>Equity curve, drawdown, calendar heatmap, win rate, profit factor, expectancy, R-multiples, Sharpe and Calmar ratios, streaks, Monte Carlo and risk of ruin, time-of-day, gap and opening-range analysis, sector exposure, execution quality and edge decay.</p>
+                    </article>
+                    <article class="card">
+                        <p class="card-num">04</p>
+                        <h3>The Edge Report</h3>
+                        <p>Your top money-makers and money-losers by session, hour, ticker and weekday, with the dollar amount on each. Export it as a PDF report or CSV.</p>
+                    </article>
+                    <article class="card">
+                        <p class="card-num">05</p>
+                        <h3>"What to cut", in dollars</h3>
+                        <p>See what is costing you money, and follow a prop-firm challenge with its own tracker on the dashboard.</p>
+                    </article>
+                    <article class="card wide">
+                        <p class="card-num">06</p>
+                        <h3>Sample trades to explore first</h3>
+                        <p>Load 30 fictional trades from the welcome screen or <em>Settings &gt; Load Sample Trades</em> and try everything before importing your own. <em>Remove Sample Trades</em> deletes only those.</p>
+                    </article>
+                    <article class="card wide">
+                        <p class="card-num">07</p>
+                        <h3>Exports, backups and restore</h3>
+                        <p>PDF reports and CSV exports, plus journal backup and restore. Backups can be protected with a password, and every backup is checked before it is restored.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section" id="tour" aria-labelledby="tour-title">
+                <p class="section-label">A look inside</p>
+                <h2 id="tour-title">The main screens</h2>
+                <p class="section-desc">All screenshots use the built-in sample trades. Every dollar amount, percentage and result in them is made up.</p>
+
+                <div class="shots">
+                    <div class="shot-row">
+                        <div class="shot-text">
+                            <h3>Journal</h3>
+                            <p>Every trade in one table: symbol, direction, shares, P&amp;L, running total, R-multiple, a letter grade, session and hour.</p>
+                            <ul>
+                                <li>Filter by symbol, session, direction and date range</li>
+                                <li>Notes, tags, emotions, checklists and screenshots per trade</li>
+                                <li>Manual entry and trade-by-trade replay</li>
+                            </ul>
+                        </div>
+                        <div class="shot">
+                            <a href="images/journal.png" data-zoom aria-label="Enlarge journal screenshot">
+                                <img src="images/journal.png" alt="Greenwick trade journal table with filters for symbol, session, direction and range, and columns for close time, symbol, direction, shares, P&amp;L, cumulative P&amp;L, R, grade, session and hour" width="1600" height="1066" loading="lazy">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="shot-row flip">
+                        <div class="shot-text">
+                            <h3>Edge Report</h3>
+                            <p>Where you make money and where you lose it, side by side, ranked by dollars.</p>
+                            <ul>
+                                <li>By session, hour, ticker and weekday</li>
+                                <li>Optional written recommendations with your own Anthropic key</li>
+                                <li>Export as PDF or CSV</li>
+                            </ul>
+                        </div>
+                        <div class="shot">
+                            <a href="images/edge-report.png" data-zoom aria-label="Enlarge Edge Report screenshot">
+                                <img src="images/edge-report.png" alt="Greenwick Edge Report: headline totals, an optional AI recommendations panel, and ranked lists of where you make and lose money by session and by hour" width="1600" height="1066" loading="lazy">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="shot-row">
+                        <div class="shot-text">
+                            <h3>Analytics</h3>
+                            <p>Six tabs: Timing, Sessions, Symbols, Risk, Behavioral and Advanced.</p>
+                            <ul>
+                                <li>P&amp;L calendar and P&amp;L by hour (Eastern Time)</li>
+                                <li>Day-of-week, duration and gap analysis</li>
+                                <li>Filter by symbol and time range</li>
+                            </ul>
+                        </div>
+                        <div class="shot">
+                            <a href="images/analytics.png" data-zoom aria-label="Enlarge analytics screenshot">
+                                <img src="images/analytics.png" alt="Greenwick analytics, Timing tab: a monthly P&amp;L calendar, a P&amp;L by hour bar chart with pre-market, regular and after-hours sessions, and P&amp;L by day and duration charts" width="1600" height="1066" loading="lazy">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="shot-row flip">
+                        <div class="shot-text">
+                            <h3>Import</h3>
+                            <p>Drop a CSV export on the window, choose a file, or scan a folder. Greenwick detects the format.</p>
+                            <ul>
+                                <li>10 broker and platform formats</li>
+                                <li>Generic CSV with column mapping for anything else</li>
+                                <li>Duplicates are skipped on re-import</li>
+                            </ul>
+                        </div>
+                        <div class="shot">
+                            <a href="images/import.png" data-zoom aria-label="Enlarge import screenshot">
+                                <img src="images/import.png" alt="Greenwick import screen: a drop area for CSV trade exports and the list of supported platforms, with Choose File and Scan Folder buttons" width="1600" height="1066" loading="lazy">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="privacy" aria-labelledby="privacy-title">
+                <p class="section-label">Privacy &amp; security</p>
+                <h2 id="privacy-title">Your journal stays on your Mac, encrypted</h2>
+                <p class="section-desc">There is no account to create, no subscription, no cloud sync and no telemetry. Greenwick works offline.</p>
+
+                <div class="sec-grid">
+                    <div class="sec">
+                        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>Encrypted journal</h3>
+                        <p>The database is encrypted with AES-256-GCM and is never written to disk unencrypted; it is decrypted into memory only. Its key and your API keys live in the macOS Keychain.</p>
+                    </div>
+                    <div class="sec">
+                        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>App Lock</h3>
+                        <p>Seal the journal key with your password (PBKDF2-SHA256, 600,000 rounds). Greenwick locks when it goes to the background and after a time without keyboard or mouse activity: off, 1, 5, 15, 30 or 60 minutes (15 by default).</p>
+                    </div>
+                    <div class="sec">
+                        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>Older-copy check</h3>
+                        <p>Every save is numbered. If the journal file is replaced by an older copy, Greenwick asks before opening it (with App Lock on, only with the password).</p>
+                    </div>
+                    <div class="sec">
+                        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>Password-protected backups</h3>
+                        <p>Backups can be encrypted with a password (AES-256-GCM; on by default when App Lock is on), and every backup is validated before a restore.</p>
+                    </div>
+                </div>
+                <p class="honest"><strong>Not covered by the encryption:</strong> trade screenshots are stored as plain image files, and CSV and PDF exports and backups made without a password are not encrypted. Watchlist symbols, checklist rules and display settings are kept in Greenwick's ordinary preferences file. <a href="privacy/">Read the full privacy page</a>.</p>
+            </section>
+
+            <section class="section" id="optional" aria-labelledby="optional-title">
+                <p class="section-label">Optional extras</p>
+                <h2 id="optional-title">Online features are off until you add your own key</h2>
+                <p class="section-desc">Without keys, everything else works fully offline. Both connections use HTTPS with certificate pinning, and each one runs on your own account with that provider.</p>
+                <div class="extras">
+                    <div class="extra">
+                        <p class="who">Anthropic &middot; your API key</p>
+                        <h3>AI recommendations in the Edge Report</h3>
+                        <p>Add your own Anthropic API key and switch on <em>Allow AI analysis</em> in Settings. Nothing is sent until you click <em>Run Analysis</em>.</p>
+                        <dl>
+                            <dt>Sent</dt>
+                            <dd>Summary statistics only: overall totals, and P&amp;L by session, hour, ticker and weekday.</dd>
+                            <dt>Never sent</dt>
+                            <dd>Individual trades, notes, tags, screenshots or account details.</dd>
+                        </dl>
+                    </div>
+                    <div class="extra">
+                        <p class="who">Finnhub &middot; your free key</p>
+                        <h3>Quotes and ticker search</h3>
+                        <p>The Browse and Watchlist screens can show quotes and company details and search for tickers, using your own free key from finnhub.io.</p>
+                        <dl>
+                            <dt>Sent</dt>
+                            <dd>The ticker symbols you look up or watch, and the text you type in ticker search.</dd>
+                            <dt>Never sent</dt>
+                            <dd>Your trades, P&amp;L or anything from your journal.</dd>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="install" aria-labelledby="install-title">
+                <p class="section-label">Install</p>
+                <h2 id="install-title">Download and open Greenwick</h2>
+                <p class="section-desc">Requires macOS 14 Sonoma or later. Greenwick is free software under the GNU GPL v3.0, and the full source code is on GitHub.</p>
+
+                <div class="install-grid">
+                    <div class="panel accent">
+                        <h3>Install the app</h3>
+                        <ol class="steps">
+                            <li>Download <code>Greenwick-macOS-unsigned.zip</code> from the <a href="https://github.com/djctwo/greenwick/releases/latest">latest release</a>.</li>
+                            <li>Unzip it and drag <strong>Greenwick.app</strong> to your Applications folder.</li>
+                            <li>The build is not signed with an Apple Developer ID or notarized, so macOS blocks the first launch. In Finder, <strong>right-click (or Control-click) Greenwick.app &rarr; Open</strong>, then click <strong>Open</strong> again. You only do this once.</li>
+                            <li>No Open button? Try to open the app once, then go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the message about Greenwick and click <strong>Open Anyway</strong>.</li>
+                        </ol>
+                        <p>Each release also has a <code>.sha256</code> file, so you can check the download with <code>shasum -a 256 Greenwick-macOS-unsigned.zip</code>.</p>
+                    </div>
+                    <div class="panel">
+                        <h3>Build from source</h3>
+                        <p>With Xcode 16 or later and XcodeGen you can build Greenwick yourself. The steps are in the <a href="https://github.com/djctwo/greenwick#build-from-source">README</a>.</p>
+                        <h3 style="margin-top:26px;">Windows</h3>
+                        <p><span class="soon">Windows version coming soon</span></p>
+                        <h3 style="margin-top:26px;">Questions or bugs</h3>
+                        <p>Open an issue on <a href="https://github.com/djctwo/greenwick/issues">GitHub Issues</a>. Please never post real trades, account numbers or API keys.</p>
+                    </div>
+                </div>
+
+                <div class="sibling">
+                    <p><strong>Trade forex?</strong> Greenwick is the stock-market sibling of <strong>Dojix</strong>, the free forex journal, and shares its analytics engine.</p>
+                    <a href="https://dojix.app" class="btn btn-secondary">Visit dojix.app</a>
+                </div>
+            </section>
+
+            <section class="final" aria-labelledby="final-title">
+                <p class="section-label">Get started</p>
+                <h2 id="final-title">Download Greenwick</h2>
+                <p class="section-desc">Free for macOS 14 Sonoma or later. No account needed.</p>
+                <div class="cta-group">
+                    <a href="https://github.com/djctwo/greenwick/releases/latest" class="btn btn-primary">Download for Mac</a>
+                    <a href="https://github.com/djctwo/greenwick" class="btn btn-secondary">View on GitHub</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <nav class="footer-links" aria-label="Footer">
+                <a href="https://github.com/djctwo/greenwick">GitHub</a>
+                <a href="privacy/">Privacy</a>
+                <a href="license/">License</a>
+            </nav>
+            <p>&copy; 2026 Douglas Cleary. Greenwick is free software under the GNU GPL v3.0.</p>
+            <p>Created by <a href="https://github.com/djctwo">Douglas Cleary</a></p>
+        </div>
+    </footer>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Screenshot preview">
+        <form method="dialog"><button type="submit" aria-label="Close preview">&times;</button></form>
+        <img alt="">
+    </dialog>
+    <script src="assets/site.js" defer></script>
+</body>
+</html>

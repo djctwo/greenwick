@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy: Greenwick, the Free Stock Trading Journal for Mac</title>
+    <meta name="description" content="How Greenwick, a free and open-source trading journal for Mac, handles your data: an encrypted journal that stays on your Mac, no account, no telemetry, and opt-in online features.">
+    <meta name="theme-color" content="#0a0f0e">
+    <link rel="canonical" href="https://djctwo.github.io/greenwick/privacy/">
+    <link rel="icon" type="image/svg+xml" href="../images/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Greenwick">
+    <meta property="og:url" content="https://djctwo.github.io/greenwick/privacy/">
+    <meta property="og:title" content="Greenwick privacy: your trading journal stays on your Mac">
+    <meta property="og:description" content="Encrypted local journal, no account, no telemetry. Exactly what the optional online features send, and when.">
+    <meta property="og:image" content="https://djctwo.github.io/greenwick/images/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Greenwick dashboard with fictional sample trades">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Greenwick privacy">
+    <meta name="twitter:description" content="Encrypted local journal, no account, no telemetry. Exactly what the optional online features send.">
+    <meta name="twitter:image" content="https://djctwo.github.io/greenwick/images/og-image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/site.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Greenwick",
+        "url": "https://djctwo.github.io/greenwick/",
+        "description": "A free, open-source trading journal for stock and day traders on the Mac. The journal is encrypted and stays on your Mac; there is no account and no telemetry.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "macOS",
+        "softwareRequirements": "macOS 14 Sonoma or later",
+        "isAccessibleForFree": true,
+        "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "downloadUrl": "https://github.com/djctwo/greenwick/releases/latest",
+        "image": "https://djctwo.github.io/greenwick/images/dashboard.png",
+        "author": { "@type": "Person", "name": "Douglas Cleary", "url": "https://github.com/djctwo" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header class="site-nav">
+        <div class="container">
+            <a href="../" class="logo" aria-label="Greenwick home"><img src="../images/apple-touch-icon.png" alt="" width="30" height="30"><span class="word">greenwick</span></a>
+            <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            </button>
+            <nav class="nav-links" id="nav-links" aria-label="Main">
+                <a href="../#features">Features</a>
+                <a href="./" aria-current="page">Privacy</a>
+                <a href="../#install">Install</a>
+                <a href="https://github.com/djctwo/greenwick">GitHub</a>
+                <a href="https://github.com/djctwo/greenwick/releases/latest" class="btn btn-primary">Download</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="container narrow doc">
+        <h1>Privacy</h1>
+        <p class="updated">Last updated: October 27, 2026</p>
+
+        <div class="summary">
+            <p>Greenwick is a free, open-source Mac app. It has no servers, no accounts and no analytics. <strong>Your trading journal stays on your Mac, encrypted.</strong> Online features are optional, off by default, and use keys you add yourself.</p>
+        </div>
+        <p style="margin-top:16px;">This page explains what the app stores, what it can send over the network, and when. Because the source code is public, you can <a href="https://github.com/djctwo/greenwick">check every statement here yourself</a>.</p>
+
+        <h2><span class="n">01</span>What stays on your Mac</h2>
+        <ul>
+            <li><strong>Your journal</strong>: trades, notes, tags, emotions, checklists and your prop-firm account size and limits are kept in <code>~/Library/Application Support/Greenwick/Greenwick.sqlite</code>. The file is encrypted with AES-256-GCM and is never written to disk unencrypted; Greenwick decrypts it into memory only while it runs.</li>
+            <li><strong>Trade screenshots</strong>: stored in <code>~/Library/Application Support/Greenwick/Screenshots/</code> as plain image files. They are <strong>not</strong> encrypted.</li>
+            <li><strong>The encryption key</strong>: kept in your macOS Keychain. With App Lock on, the key is sealed with your password (PBKDF2-SHA256, 600,000 rounds), so the journal can't be decrypted without it.</li>
+            <li><strong>API keys you add</strong> (Anthropic, Finnhub): stored in your macOS Keychain.</li>
+            <li><strong>Preferences</strong>: watchlist symbols, checklist rules, the inactivity lock setting and display preferences are kept in Greenwick's ordinary preferences file, which is not encrypted.</li>
+        </ul>
+
+        <h2><span class="n">02</span>What Greenwick does not do</h2>
+        <ul>
+            <li>No account, no sign-up, no subscription</li>
+            <li>No telemetry or usage analytics</li>
+            <li>No cloud sync and no server that receives your data</li>
+            <li>No ads</li>
+            <li>No automatic update checks; new versions are published on <a href="https://github.com/djctwo/greenwick/releases">GitHub Releases</a></li>
+        </ul>
+
+        <h2><span class="n">03</span>Optional online services</h2>
+        <p>Greenwick works fully offline. The two services below are off by default and run only with a key you add in Settings. Data goes directly from your Mac to the provider over HTTPS with certificate pinning; nothing passes through anyone else. As with any internet request, the provider also sees your IP address.</p>
+        <div class="table-wrap">
+            <table>
+                <caption class="sr-only">Optional online services and the data each one receives</caption>
+                <thead><tr><th scope="col">Feature</th><th scope="col">Provider</th><th scope="col">What it receives</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>AI recommendations</strong> (Edge Report &gt; Run Analysis)</td><td>Anthropic</td><td>Summary statistics, only when you click (see 3a), with your API key</td></tr>
+                    <tr><td><strong>Quotes and ticker search</strong> (Browse, Watchlist)</td><td>Finnhub</td><td>Ticker symbols and search text (see 3b), with your API key</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>3a. AI recommendations: what is sent to Anthropic</h3>
+        <p>AI analysis needs two things: your own Anthropic API key, and the <strong>Allow AI analysis</strong> switch turned on in Settings. Then, each time you click <strong>Run Analysis</strong> in the Edge Report, Greenwick sends summary statistics: overall totals, and P&amp;L by session, hour, ticker and weekday. Anthropic bills the run to your own account.</p>
+        <p><strong>Never sent:</strong> individual trades, notes, tags, screenshots or account details. Nothing is sent without your key, the switch and your click. Anthropic's handling of API requests is covered by <a href="https://www.anthropic.com/legal/privacy" rel="noopener">Anthropic's privacy policy</a>.</p>
+
+        <h3>3b. Quotes and ticker search: what is sent to Finnhub</h3>
+        <p>If you add your own Finnhub key (free at finnhub.io), the Browse and Watchlist screens fetch quotes and company details. Greenwick sends the ticker symbols you look up or keep on your watchlist, and the text you type into ticker search. Testing your key in Settings requests one quote (AAPL). Nothing from your journal is sent. Finnhub's own privacy policy applies to those requests.</p>
+
+        <h2><span class="n">04</span>Security</h2>
+        <ul>
+            <li>Journal encrypted on disk with AES-256-GCM, decrypted into memory only</li>
+            <li>Optional App Lock: locks when Greenwick goes to the background and after a time without keyboard or mouse activity (off, 1, 5, 15, 30 or 60 minutes; 15 by default)</li>
+            <li>Older-copy check: if the journal file is replaced by an older copy, Greenwick asks before opening it</li>
+            <li>Password-protected backups (AES-256-GCM, PBKDF2-SHA256 with 600,000 rounds), validated before every restore</li>
+        </ul>
+        <p><strong>Not encrypted:</strong> trade screenshots, CSV and PDF exports, and backups made without a password. A backup without a password can be read by anyone who gets the file. The full security model, including what Greenwick does not protect against, is in <a href="https://github.com/djctwo/greenwick/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+
+        <h2><span class="n">05</span>Your control</h2>
+        <p>Your data is local, so you control it directly: export it as CSV or PDF, back it up and restore it, or delete it. Deleting the app leaves the data in place; delete the <code>~/Library/Application Support/Greenwick/</code> folder to remove it. There is no other copy.</p>
+
+        <h2><span class="n">06</span>This website</h2>
+        <p>This site is a static site hosted on GitHub Pages. It sets no cookies, has no analytics, tracking scripts or forms. Like any website, the host (GitHub) receives standard request data such as your IP address, and the pages load their fonts from Google Fonts, which receives the same. Downloads and the source code are on GitHub, where GitHub's own privacy statement applies.</p>
+
+        <h2><span class="n">07</span>Changes</h2>
+        <p>If the app's behavior changes, this page and the repository's README will be updated, and the date at the top will change.</p>
+
+        <h2><span class="n">08</span>Contact</h2>
+        <p>Questions: open an issue at <a href="https://github.com/djctwo/greenwick/issues">github.com/djctwo/greenwick/issues</a>. Please never post real trades, account numbers or API keys there.</p>
+        <p>Security problems: report them privately through the repository's <a href="https://github.com/djctwo/greenwick/security/advisories/new">private vulnerability reporting</a>, not in a public issue.</p>
+    </main>
+
+    <footer>
+        <div class="container">
+            <nav class="footer-links" aria-label="Footer">
+                <a href="../">Home</a>
+                <a href="https://github.com/djctwo/greenwick">GitHub</a>
+                <a href="./" aria-current="page">Privacy</a>
+                <a href="../license/">License</a>
+            </nav>
+            <p>&copy; 2026 Douglas Cleary. Greenwick is free software under the GNU GPL v3.0.</p>
+            <p>Created by <a href="https://github.com/djctwo">Douglas Cleary</a></p>
+        </div>
+    </footer>
+    <script src="../assets/site.js" defer></script>
+</body>
+</html>
